@@ -14,6 +14,9 @@ def get_me_random_list(n):
 
 
 def sequential_search(a_list, item):
+    """Sequential search with timing"""
+    start_time = time.time()
+    
     pos = 0
     found = False
 
@@ -23,10 +26,14 @@ def sequential_search(a_list, item):
         else:
             pos = pos + 1
 
-    return found
+    end_time = time.time()
+    return found, (end_time - start_time)
 
 
 def ordered_sequential_search(a_list, item):
+    """Ordered sequential search with timing"""
+    start_time = time.time()
+    
     pos = 0
     found = False
     stop = False
@@ -39,14 +46,18 @@ def ordered_sequential_search(a_list, item):
             else:
                 pos = pos + 1
 
-    return found
+    end_time = time.time()
+    return found, (end_time - start_time)
 
 
-def binary_search_iterative(a_list,item):
+def binary_search_iterative(a_list, item):
+    """Binary search iterative with timing"""
+    start_time = time.time()
+    
     first = 0
-
     last = len(a_list) - 1
     found = False
+    
     while first <= last and not found:
         midpoint = (first + last) // 2
         if a_list[midpoint] == item:
@@ -57,37 +68,80 @@ def binary_search_iterative(a_list,item):
             else:
                 first = midpoint + 1
 
-    return found
+    end_time = time.time()
+    return found, (end_time - start_time)
+
     
+def binary_search_recursive(a_list, item):
+    """Binary search recursive with timing"""
+    start_time = time.time()
     
-def binary_search_recursive(a_list,item):
-    if len(a_list) == 0:
-        return False
-    else:
-        midpoint = len(a_list) // 2
-        if a_list[midpoint] == item:
-            return True
+    def _helper(lst):
+        if len(lst) == 0:
+            return False
         else:
-            if item < a_list[midpoint]:
-                return binary_search_recursive(a_list[:midpoint], item)
+            midpoint = len(lst) // 2
+            if lst[midpoint] == item:
+                return True
             else:
-                return binary_search_recursive(a_list[midpoint + 1:], item)
+                if item < lst[midpoint]:
+                    return _helper(lst[:midpoint])
+                else:
+                    return _helper(lst[midpoint + 1:])
+    
+    found = _helper(a_list)
+    end_time = time.time()
+    return found, (end_time - start_time)
 
 
 if __name__ == "__main__":
     """Main entry point"""
-    the_size = 500
-
-    total_time = 0
-    for i in range(100):
-        mylist = get_me_random_list(the_size)
-        # sorting is not needed for sequential search.
-        mylist = sorted(mylist)
-
-        start = time.time()
-        check = binary_search_iterative(mylist, 99999999)
-        time_spent = time.time() - start
-        total_time += time_spent
-
-    avg_time = total_time / 100
-    print(f"Binary Search Iterative took {avg_time:10.7f} seconds to run, on average for a list of {the_size} elements")
+    
+    # List sizes to test
+    list_sizes = [500, 1000, 5000]
+    
+    # Target element (worst case - not in list)
+    target = 99999999
+    
+    # Run benchmarks for each list size
+    for size in list_sizes:
+        print(f"List Size: {size} elements")
+        
+        # Test Sequential Search
+        total_time = 0
+        for i in range(100):
+            mylist = get_me_random_list(size)
+            found, time_spent = sequential_search(mylist, target)
+            total_time += time_spent
+        time_taken = total_time / 100
+        print(f"Sequential Search took {time_taken:10.7f} seconds to run, on average")
+        
+        # Test Ordered Sequential Search
+        total_time = 0
+        for i in range(100):
+            mylist = get_me_random_list(size)
+            mylist = sorted(mylist)  
+            found, time_spent = ordered_sequential_search(mylist, target)
+            total_time += time_spent
+        time_taken = total_time / 100
+        print(f"Ordered Sequential Search took {time_taken:10.7f} seconds to run, on average")
+        
+        # Test Binary Search Iterative
+        total_time = 0
+        for i in range(100):
+            mylist = get_me_random_list(size)
+            mylist = sorted(mylist)  
+            found, time_spent = binary_search_iterative(mylist, target)
+            total_time += time_spent
+        time_taken = total_time / 100
+        print(f"Binary Search Iterative took {time_taken:10.7f} seconds to run, on average")
+        
+        # Test Binary Search Recursive
+        total_time = 0
+        for i in range(100):
+            mylist = get_me_random_list(size)
+            mylist = sorted(mylist)  
+            found, time_spent = binary_search_recursive(mylist, target)
+            total_time += time_spent
+        time_taken = total_time / 100
+        print(f"Binary Search Recursive took {time_taken:10.7f} seconds to run, on average")
